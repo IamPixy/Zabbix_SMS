@@ -1,24 +1,23 @@
-#!/usr/bin/python3
-# Python samples are made with Requests: HTTP for Humans
-
 import requests
+import sys
 
-url = "https://sms.magfa.com/api/http/sms/v2/send"
-headers = {'accept': "application/json", 'cache-control': "no-cache"}
+def send_text_message(username, password, domain, url, sender_number, message, receiver_number):
+    headers = {'accept': "application/json", 'cache-control': "no-cache"}
+    payload_json = {'senders': [sender_number], 'messages': [message], 'recipients': [receiver_number]}
 
-# Credentials
-username = "your UserName"
-password = "Your Password"
-domain = "Your Domain"
-magfaNumber = "Your Magfa Number"
-text = 'Put the Message that you want to send here'
-receivers = ['Number 1', 'Number 2']
-
-
-
-payload_json = {'senders': magfaNumber, 
-                'messages':text, 
-                'recipients': receivers}
-
-# Call json
-response = requests.post(url, headers=headers, auth=(username + '/' + domain, password), json=payload_json)
+    try:
+        response = requests.post(url, headers=headers, auth=(username + '/' + domain, password), json=payload_json)
+        print(response.json())
+        print('*****************************************************************')
+        if response.status_code == 200:
+            print("Message sent successfully!")
+        else:
+            print("Error sending message:", response.text)
+    except Exception as e:
+        print(f"Error: {e}")
+if __name__ == "__main__":
+    if len(sys.argv) != 8:
+        print("Usage: python script.py <username> <password> <domain> <URL> <sender_number> <message> <receiver_number>")
+    else:
+        username, password, domain, url, sender_number, message, receiver_number = sys.argv[1:8]
+        send_text_message(username, password, domain, url, sender_number, message, receiver_number)
